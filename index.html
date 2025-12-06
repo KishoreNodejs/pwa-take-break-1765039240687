@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes" />
+  <title>Take Break </title>
+  
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="icon-192.png" />
+  
+  <meta name="theme-color" content="#059669" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Take Break " />
+  <link rel="apple-touch-icon" href="icon-512.png" />
+  
+  <style>
+    * { box-sizing: border-box; }
+    html, body { 
+      margin: 0; 
+      padding: 0; 
+      width: 100%; 
+      height: 100%; 
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Break Timer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      * {
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+      .pulse {
+        animation: pulse 2s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+      .time-btn {
+        transition: all 0.2s;
+      }
+      .time-btn:active {
+        transform: scale(0.95);
+      }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-emerald-500 to-teal-600 overflow-hidden">
+    <div id="app" class="flex flex-col h-screen max-w-md mx-auto">
+      <!-- Status Bar -->
+      <div class="bg-emerald-700/50 text-white px-4 py-2 flex justify-between items-center text-xs hidden">
+        <span id="current-time">12:30</span>
+        <div class="flex gap-2">
+          <i class="fas fa-wifi"></i>
+          <i class="fas fa-signal"></i>
+          <i class="fas fa-battery-three-quarters"></i>
+        </div>
+      </div>
+      <!-- Main Screen -->
+      <main class="flex-1 flex flex-col items-center justify-center p-6">
+        <!-- Timer Not Started -->
+        <div id="start-screen" class="text-center">
+          <div class="bg-white/20 backdrop-blur-lg rounded-full w-48 h-48 flex items-center justify-center mb-8 mx-auto shadow-2xl">
+            <i class="fas fa-coffee text-white text-7xl"></i>
+          </div>
+          <h1 class="text-white text-4xl font-bold mb-4">Break Timer</h1>
+          <p class="text-white/90 text-lg mb-8">Take a break. You deserve it.</p>
+          <button id="start-break-btn" class="time-btn bg-white text-emerald-600 px-12 py-5 rounded-full text-2xl font-bold shadow-2xl hover:shadow-3xl">
+            Start Break
+          </button>
+        </div>
+        <!-- Choose Time Screen -->
+        <div id="time-screen" class="hidden w-full">
+          <h2 class="text-white text-3xl font-bold text-center mb-8">Choose Duration</h2>
+          <div class="grid grid-cols-3 gap-4 mb-8">
+            <button class="time-option time-btn bg-white/90 hover:bg-white text-emerald-600 py-8 rounded-2xl text-3xl font-bold shadow-xl" data-time="5">5</button>
+            <button class="time-option time-btn bg-white/90 hover:bg-white text-emerald-600 py-8 rounded-2xl text-3xl font-bold shadow-xl" data-time="10">10</button>
+            <button class="time-option time-btn bg-white/90 hover:bg-white text-emerald-600 py-8 rounded-2xl text-3xl font-bold shadow-xl" data-time="15">15</button>
+            <button class="time-option time-btn bg-white/90 hover:bg-white text-emerald-600 py-8 rounded-2xl text-3xl font-bold shadow-xl" data-time="20">20</button>
+            <button class="time-option time-btn bg-white/90 hover:bg-white text-emerald-600 py-8 rounded-2xl text-3xl font-bold shadow-xl" data-time="30">30</button>
+            <button class="time-option time-btn bg-white/90 hover:bg-white text-emerald-600 py-8 rounded-2xl text-3xl font-bold shadow-xl" data-time="45">45</button>
+            <button class="time-option time-btn bg-white/90 hover:bg-white text-emerald-600 py-8 rounded-2xl text-3xl font-bold shadow-xl" data-time="60">60</button>
+          </div>
+          <p class="text-white/80 text-center text-sm">Minutes</p>
+        </div>
+        <!-- Timer Running Screen -->
+        <div id="timer-screen" class="hidden text-center w-full">
+          <div class="bg-white/20 backdrop-blur-lg rounded-3xl p-8 shadow-2xl mb-8">
+            <p class="text-white/90 text-xl mb-4">Break Time</p>
+            <div id="timer-display" class="text-white text-8xl font-bold mb-4 tracking-wider">05:00</div>
+            <div class="flex justify-center gap-4">
+              <button id="pause-btn" class="time-btn bg-white/30 hover:bg-white/40 text-white px-8 py-3 rounded-full font-semibold">
+                <i class="fas fa-pause"></i> Pause
+              </button>
+              <button id="cancel-btn" class="time-btn bg-white/30 hover:bg-white/40 text-white px-8 py-3 rounded-full font-semibold">
+                <i class="fas fa-times"></i> Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Alarm Screen -->
+        <div id="alarm-screen" class="hidden text-center w-full">
+          <div class="pulse bg-white/20 backdrop-blur-lg rounded-3xl p-12 shadow-2xl">
+            <i class="fas fa-bell text-white text-8xl mb-6 pulse"></i>
+            <h2 class="text-white text-4xl font-bold mb-4">Break Over!</h2>
+            <p class="text-white/90 text-xl mb-8">Time to get back to work</p>
+            <button id="stop-alarm-btn" class="time-btn bg-white text-emerald-600 px-12 py-5 rounded-full text-2xl font-bold shadow-2xl">
+              Stop Alarm
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script>
+      let timerInterval = null;
+      let alarmInterval = null;
+      let timeLeft = 0;
+      let isPaused = false;
+      const startScreen = document.getElementById('start-screen');
+      const timeScreen = document.getElementById('time-screen');
+      const timerScreen = document.getElementById('timer-screen');
+      const alarmScreen = document.getElementById('alarm-screen');
+      const timerDisplay = document.getElementById('timer-display');
+      const startBreakBtn = document.getElementById('start-break-btn');
+      const timeOptions = document.querySelectorAll('.time-option');
+      const pauseBtn = document.getElementById('pause-btn');
+      const cancelBtn = document.getElementById('cancel-btn');
+      const stopAlarmBtn = document.getElementById('stop-alarm-btn');
+      const currentTimeEl = document.getElementById('current-time');
+      // Update clock
+      function updateClock() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        currentTimeEl.textContent = `${hours}:${minutes}`;
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+      // Format time display
+      function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      }
+      // Show screen
+      function showScreen(screen) {
+        [startScreen, timeScreen, timerScreen, alarmScreen].forEach(s => s.classList.add('hidden'));
+        screen.classList.remove('hidden');
+      }
+      // Play alarm sound
+      function playAlarm() {
+        const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+        alarmInterval = setInterval(() => {
+          const oscillator = audioCtx.createOscillator();
+          const gainNode = audioCtx.createGain();
+          oscillator.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+          gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+          oscillator.start();
+          oscillator.stop(audioCtx.currentTime + 0.3);
+          setTimeout(() => {
+            const oscillator2 = audioCtx.createOscillator();
+            const gainNode2 = audioCtx.createGain();
+            oscillator2.connect(gainNode2);
+            gainNode2.connect(audioCtx.destination);
+            oscillator2.type = 'sine';
+            oscillator2.frequency.setValueAtTime(600, audioCtx.currentTime);
+            gainNode2.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            oscillator2.start();
+            oscillator2.stop(audioCtx.currentTime + 0.3);
+          }, 300);
+        }, 1000);
+      }
+      // Stop alarm
+      function stopAlarm() {
+        if (alarmInterval) {
+          clearInterval(alarmInterval);
+          alarmInterval = null;
+        }
+      }
+      // Start timer
+      function startTimer(minutes) {
+        timeLeft = minutes * 60;
+        timerDisplay.textContent = formatTime(timeLeft);
+        showScreen(timerScreen);
+        isPaused = false;
+        pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+        timerInterval = setInterval(() => {
+          if (!isPaused) {
+            timeLeft--;
+            timerDisplay.textContent = formatTime(timeLeft);
+            if (timeLeft <= 0) {
+              clearInterval(timerInterval);
+              showScreen(alarmScreen);
+              playAlarm();
+            }
+          }
+        }, 1000);
+      }
+      // Event listeners
+      startBreakBtn.addEventListener('click', () => {
+        showScreen(timeScreen);
+      });
+      timeOptions.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const minutes = parseInt(btn.dataset.time);
+          startTimer(minutes);
+        });
+      });
+      pauseBtn.addEventListener('click', () => {
+        isPaused = !isPaused;
+        if (isPaused) {
+          pauseBtn.innerHTML = '<i class="fas fa-play"></i> Resume';
+        } else {
+          pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+        }
+      });
+      cancelBtn.addEventListener('click', () => {
+        clearInterval(timerInterval);
+        showScreen(startScreen);
+        isPaused = false;
+      });
+      stopAlarmBtn.addEventListener('click', () => {
+        stopAlarm();
+        showScreen(startScreen);
+      });
+    </script>
+  </body>
+</html>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.error('SW error:', err));
+  });
+}
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  deferredPrompt = e;
+});
+
+window.installPWA = async function() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    return outcome;
+  }
+  return 'not_available';
+};
+</script>
+</body>
+</html>
